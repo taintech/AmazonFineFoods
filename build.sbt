@@ -8,6 +8,7 @@ scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.4.11"
+  ,"net.sf.opencsv" % "opencsv" % "2.1"
 )
 
 enablePlugins(JavaServerAppPackaging)

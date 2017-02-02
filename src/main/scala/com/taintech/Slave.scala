@@ -1,6 +1,7 @@
 package com.taintech
 
 import akka.actor.{Actor, ActorLogging}
+import com.taintech.Slave.NextPlease
 
 object Slave {
   val HEADER = "Id,ProductId,UserId,ProfileName,HelpfulnessNumerator,HelpfulnessDenominator,Score,Time,Summary,Text"
@@ -10,6 +11,7 @@ object Slave {
     * 2,B00813GRG4,A1D87F6ZCVE5NK,dll pa,0,0,1,1346976000,Not as Advertised,"Product arrived labeled as Jumbo Salted Peanuts...the peanuts were actually small sized unsalted. Not sure if this was an error or if the vendor intended to represent the product as ""Jumbo""."
     */
   case class Line(s: String)
+  case object NextPlease
   case object EndOfFile
   case object Done
 }
@@ -19,8 +21,10 @@ class Slave extends Actor with ActorLogging {
   var count = 0
 
   def receive = {
-    case Slave.Line(s) =>
+    case Array(first: String, _*) =>
+      log.info(first)
       count = count + 1
+      sender() ! NextPlease
     case Slave.EndOfFile =>
       log.info(s"Number Of Lines: $count")
       sender() ! Slave.Done
