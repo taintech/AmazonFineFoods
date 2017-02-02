@@ -1,10 +1,10 @@
 package com.taintech
 
-import java.io.{FileReader, IOException}
+import java.io.IOException
 
 import akka.actor.{Actor, ActorLogging, Props}
-import Slave.{Done, EndOfFile, FailedToParse, Line}
-import au.com.bytecode.opencsv.{CSVParser, CSVReader}
+import au.com.bytecode.opencsv.CSVParser
+import com.taintech.Slave.{EndOfFile, FailedToParse}
 
 import scala.io.Source
 

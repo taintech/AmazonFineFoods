@@ -13,7 +13,7 @@ libraryDependencies ++= Seq(
 
 enablePlugins(JavaServerAppPackaging)
 
-mainClass in Compile := Some("sample.hello.Main")
+mainClass in Compile := Some("com.taintech.Main")
 
 mappings in Universal ++= {
   // optional example illustrating how to copy additional directory

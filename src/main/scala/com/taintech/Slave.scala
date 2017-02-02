@@ -3,8 +3,6 @@ package com.taintech
 import akka.actor.{Actor, ActorLogging}
 import com.taintech.Slave.{FailedToParse, NextPlease}
 
-import scala.collection.immutable.HashMap.HashMap1
-
 object Slave {
   val HEADER = "Id,ProductId,UserId,ProfileName,HelpfulnessNumerator,HelpfulnessDenominator,Score,Time,Summary,Text"
 
@@ -35,19 +33,19 @@ class Slave extends Actor with ActorLogging {
 
   def receive = {
     case Array(
-      id: String,
-      productId: String,
-      userId: String,
-      profileName: String,
-      helpfulnessNumerator: String,
-      helpfulnessDenominator: String,
-      score: String,
-      time: String,
-      summary: String,
-      text: String
+    id: String,
+    productId: String,
+    userId: String,
+    profileName: String,
+    helpfulnessNumerator: String,
+    helpfulnessDenominator: String,
+    score: String,
+    time: String,
+    summary: String,
+    text: String
     ) =>
       count = count + 1
-//      log.info(text)
+      //      log.info(text)
       countActiveUser(userId)
       countCommentedItem(productId)
       countWords(text)
@@ -72,12 +70,14 @@ class Slave extends Actor with ActorLogging {
       sender() ! Slave.Done
   }
 
-  def countHashMap(hashMap: scala.collection.mutable.HashMap[String, Int], value: String): Unit = hashMap.get(value) match {
-    case Some(i: Int) => hashMap.put(value, i + 1)
-    case None => hashMap.put(value, 1)
-  }
+  def countHashMap(hashMap: scala.collection.mutable.HashMap[String, Int], value: String): Unit =
+    hashMap.get(value) match {
+      case Some(i: Int) => hashMap.put(value, i + 1)
+      case None => hashMap.put(value, 1)
+    }
 
-  def topFrom(hashMap: scala.collection.mutable.HashMap[String, Int], i: Int) = hashMap.toList.sortBy(e => e._2).reverse.take(i).map(e => e._1 + " - " + e._2 + " times").mkString("\n")
+  def topFrom(hashMap: scala.collection.mutable.HashMap[String, Int], i: Int): String =
+    hashMap.toList.sortBy(e => e._2).reverse.take(i).map(e => e._1 + " - " + e._2 + " times").mkString("\n")
 
   def countActiveUser(userId: String): Unit = countHashMap(activeUsers, userId)
 
