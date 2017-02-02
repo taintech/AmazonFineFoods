@@ -3,6 +3,8 @@ package com.taintech
 import akka.actor.{Actor, ActorLogging}
 import com.taintech.Slave.{FailedToParse, NextPlease}
 
+import scala.collection.immutable.HashMap.HashMap1
+
 object Slave {
   val HEADER = "Id,ProductId,UserId,ProfileName,HelpfulnessNumerator,HelpfulnessDenominator,Score,Time,Summary,Text"
 
@@ -27,7 +29,9 @@ class Slave extends Actor with ActorLogging {
   var count = 0
   var error = 0
   var errors = ""
-//  val activeUsers = scala.collection.mutable.
+  val activeUsers = scala.collection.mutable.HashMap.empty[String, Int]
+  val commentedFood = scala.collection.mutable.HashMap.empty[String, Int]
+  val wordCount = scala.collection.mutable.HashMap.empty[String, Int]
 
   def receive = {
     case Array(
@@ -40,9 +44,13 @@ class Slave extends Actor with ActorLogging {
       score: String,
       time: String,
       summary: String,
-      text: String) =>
+      text: String
+    ) =>
       count = count + 1
-      //      log.info(count.toString)
+//      log.info(text)
+      countActiveUser(userId)
+      countCommentedItem(productId)
+      countWords(text)
       sender() ! NextPlease
     case (FailedToParse, line: String) =>
       //      log.info("failed")
@@ -55,9 +63,25 @@ class Slave extends Actor with ActorLogging {
       sender() ! NextPlease
     case Slave.EndOfFile
     =>
+      log.info(s"Most active users(UserId): \n${topFrom(activeUsers, 10)}")
+      log.info(s"Most commented food(ProductId): \n${topFrom(commentedFood, 10)}")
+      log.info(s"Most used word: \n${topFrom(wordCount, 10)}")
       log.info(s"Number Of Lines: $count")
       log.info(s"Number Of Errors: $error")
       log.info(s"Error Lines: $errors")
       sender() ! Slave.Done
   }
+
+  def countHashMap(hashMap: scala.collection.mutable.HashMap[String, Int], value: String): Unit = hashMap.get(value) match {
+    case Some(i: Int) => hashMap.put(value, i + 1)
+    case None => hashMap.put(value, 1)
+  }
+
+  def topFrom(hashMap: scala.collection.mutable.HashMap[String, Int], i: Int) = hashMap.toList.sortBy(e => e._2).reverse.take(i).map(e => e._1 + " - " + e._2 + " times").mkString("\n")
+
+  def countActiveUser(userId: String): Unit = countHashMap(activeUsers, userId)
+
+  def countCommentedItem(itemId: String): Unit = countHashMap(commentedFood, itemId)
+
+  def countWords(text: String): Unit = text.toLowerCase.split("\\W+").foreach(countHashMap(wordCount, _))
 }
