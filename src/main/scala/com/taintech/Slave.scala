@@ -1,7 +1,7 @@
 package com.taintech
 
 import akka.actor.{Actor, ActorLogging}
-import com.taintech.Slave.NextPlease
+import com.taintech.Slave.{FailedToParse, NextPlease}
 
 object Slave {
   val HEADER = "Id,ProductId,UserId,ProfileName,HelpfulnessNumerator,HelpfulnessDenominator,Score,Time,Summary,Text"
@@ -12,6 +12,7 @@ object Slave {
     */
   case class Line(s: String)
   case object NextPlease
+  case object FailedToParse
   case object EndOfFile
   case object Done
 }
@@ -19,14 +20,27 @@ object Slave {
 class Slave extends Actor with ActorLogging {
 
   var count = 0
+  var error = 0
+  var errors = ""
 
   def receive = {
     case Array(first: String, _*) =>
-      log.info(first)
       count = count + 1
+//      log.info(count.toString)
+      sender() ! NextPlease
+    case (FailedToParse, line: String) =>
+//      log.info("failed")
+      error = error + 1
+      errors = errors + "\n" + line
+      sender() ! NextPlease
+    case s: String =>
+      count = count + 1
+//      log.info(count.toString)
       sender() ! NextPlease
     case Slave.EndOfFile =>
       log.info(s"Number Of Lines: $count")
+      log.info(s"Number Of Errors: $error")
+      log.info(s"Error Lines: $errors")
       sender() ! Slave.Done
   }
 }

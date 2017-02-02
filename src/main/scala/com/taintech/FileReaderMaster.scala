@@ -1,9 +1,9 @@
 package com.taintech
 
-import java.io.FileReader
+import java.io.{FileReader, IOException}
 
 import akka.actor.{Actor, ActorLogging, Props}
-import Slave.{EndOfFile, Line}
+import Slave.{Done, EndOfFile, FailedToParse, Line}
 import au.com.bytecode.opencsv.{CSVParser, CSVReader}
 
 import scala.io.Source
@@ -13,17 +13,28 @@ class FileReaderMaster extends Actor with ActorLogging {
   val csv = new CSVParser(',')
   val lines: Iterator[String] = Source.fromFile("/Users/taintech/Downloads/amazon-fine-foods/Reviews.csv").getLines
 
-  def next = csv.parseLine(lines.next())
 
   override def preStart(): Unit = {
     // create the greeter actor
     val slave = context.actorOf(Props[Slave], "greeter")
     lines.next()
-    slave ! next
+    slave ! lines.next()
   }
 
   def receive = {
-    case Slave.NextPlease => sender() ! next
+    case Slave.NextPlease if lines.nonEmpty => {
+      val line = lines.next()
+      try {
+        sender() ! csv.parseLine(line)
+      } catch {
+        case ex: IOException =>
+          log.error(ex, "Failed to Parse")
+          sender() ! (FailedToParse, line)
+        case e: Any =>
+          log.info("Something strange." + e.toString)
+      }
+    }
+    case Slave.NextPlease if lines.isEmpty => sender() ! EndOfFile
     // when the greeter is done, stop this actor and with it the application
     case Slave.Done => context.stop(self)
   }
