@@ -10,7 +10,7 @@ import scala.io.Source
 
 class FileReaderMaster extends Actor with ActorLogging {
 
-  val csv = new CSVParser(',')
+  val csv = new CSVParser(',', '"', 0, false)
   val lines: Iterator[String] = Source.fromFile("/Users/taintech/Downloads/amazon-fine-foods/Reviews.csv").getLines
 
 

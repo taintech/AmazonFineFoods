@@ -11,10 +11,15 @@ object Slave {
     * 2,B00813GRG4,A1D87F6ZCVE5NK,dll pa,0,0,1,1346976000,Not as Advertised,"Product arrived labeled as Jumbo Salted Peanuts...the peanuts were actually small sized unsalted. Not sure if this was an error or if the vendor intended to represent the product as ""Jumbo""."
     */
   case class Line(s: String)
+
   case object NextPlease
+
   case object FailedToParse
+
   case object EndOfFile
+
   case object Done
+
 }
 
 class Slave extends Actor with ActorLogging {
@@ -22,22 +27,34 @@ class Slave extends Actor with ActorLogging {
   var count = 0
   var error = 0
   var errors = ""
+//  val activeUsers = scala.collection.mutable.
 
   def receive = {
-    case Array(first: String, _*) =>
+    case Array(
+      id: String,
+      productId: String,
+      userId: String,
+      profileName: String,
+      helpfulnessNumerator: String,
+      helpfulnessDenominator: String,
+      score: String,
+      time: String,
+      summary: String,
+      text: String) =>
       count = count + 1
-//      log.info(count.toString)
+      //      log.info(count.toString)
       sender() ! NextPlease
     case (FailedToParse, line: String) =>
-//      log.info("failed")
+      //      log.info("failed")
       error = error + 1
       errors = errors + "\n" + line
       sender() ! NextPlease
     case s: String =>
       count = count + 1
-//      log.info(count.toString)
+      //      log.info(count.toString)
       sender() ! NextPlease
-    case Slave.EndOfFile =>
+    case Slave.EndOfFile
+    =>
       log.info(s"Number Of Lines: $count")
       log.info(s"Number Of Errors: $error")
       log.info(s"Error Lines: $errors")
