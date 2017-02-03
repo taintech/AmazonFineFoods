@@ -1,8 +1,8 @@
-package com.taintech.actor
+package com.taintech.common.actor
 
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import com.taintech.actor.StringCounter.{GetTopStrings, StringCount}
+import StringCounter.{GetTopStrings, StringCount}
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, MustMatchers}
 
 /**

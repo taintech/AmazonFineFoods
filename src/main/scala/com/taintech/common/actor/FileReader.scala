@@ -1,7 +1,7 @@
-package com.taintech.actor
+package com.taintech.common.actor
 
 import akka.actor.{Actor, ActorLogging, Props}
-import com.taintech.actor.FileReader.{EOF, Next}
+import FileReader.{EOF, Next}
 
 import scala.io.Source
 

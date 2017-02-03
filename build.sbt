@@ -15,7 +15,7 @@ libraryDependencies ++= Seq(
 
 enablePlugins(JavaServerAppPackaging)
 
-mainClass in Compile := Some("com.taintech.Main")
+mainClass in Compile := Some("com.taintech.aff.main.AmazonFineFoodApp")
 
 mappings in Universal ++= {
   // optional example illustrating how to copy additional directory

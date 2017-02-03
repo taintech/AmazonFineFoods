@@ -1,8 +1,8 @@
-package com.taintech.actor
+package com.taintech.common.actor
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import com.taintech.actor.FileReader.{EOF, Next}
+import FileReader.{EOF, Next}
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, MustMatchers}
 
 /**

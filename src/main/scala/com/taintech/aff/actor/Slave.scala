@@ -1,7 +1,7 @@
-package com.taintech
+package com.taintech.aff.actor
 
 import akka.actor.{Actor, ActorLogging}
-import com.taintech.Slave.{FailedToParse, NextPlease}
+import com.taintech.aff.actor.Slave.{FailedToParse, NextPlease}
 
 object Slave {
   val HEADER = "Id,ProductId,UserId,ProfileName,HelpfulnessNumerator,HelpfulnessDenominator,Score,Time,Summary,Text"

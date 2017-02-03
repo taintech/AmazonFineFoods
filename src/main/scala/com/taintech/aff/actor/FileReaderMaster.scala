@@ -1,10 +1,10 @@
-package com.taintech
+package com.taintech.aff.actor
 
 import java.io.IOException
 
 import akka.actor.{Actor, ActorLogging, Props}
 import au.com.bytecode.opencsv.CSVParser
-import com.taintech.Slave.{EndOfFile, FailedToParse}
+import com.taintech.aff.actor.Slave.{EndOfFile, FailedToParse}
 
 import scala.io.Source
 

@@ -1,6 +1,8 @@
-package com.taintech
+package com.taintech.aff.main
 
-object Main {
+import com.taintech.aff.actor.FileReaderMaster
+
+object AmazonFineFoodApp {
 
   def main(args: Array[String]): Unit = {
     akka.Main.main(Array(classOf[FileReaderMaster].getName))

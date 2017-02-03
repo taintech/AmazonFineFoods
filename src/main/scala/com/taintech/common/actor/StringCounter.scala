@@ -1,4 +1,4 @@
-package com.taintech.actor
+package com.taintech.common.actor
 
 import akka.actor.{Actor, ActorLogging}
 
