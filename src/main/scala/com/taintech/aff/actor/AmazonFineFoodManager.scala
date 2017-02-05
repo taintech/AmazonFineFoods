@@ -4,13 +4,13 @@ import java.security.MessageDigest
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.ask
-
-import scala.concurrent.duration._
 import akka.util.Timeout
 import au.com.bytecode.opencsv.CSVParser
 import com.taintech.common.actor.FileReader.{EOF, Line, Next}
 import com.taintech.common.actor.StringCounter.{GetTopStrings, StringCount}
 import com.taintech.common.actor.{FileReader, StringCounter}
+
+import scala.concurrent.duration._
 
 /**
   * Author: Rinat Tainov
@@ -43,7 +43,7 @@ class AmazonFineFoodManager extends Actor with ActorLogging {
   def receive = {
     case Line(s: String) =>
       val hash = md5(s)
-      if (!uniques.contains(hash)){
+      if (!uniques.contains(hash)) {
         uniques.add(hash)
         val review = parse(s)
         review.text.toLowerCase.split("\\W+").foreach(e => wordStats ! e)
