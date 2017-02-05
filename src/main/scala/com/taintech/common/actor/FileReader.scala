@@ -1,7 +1,7 @@
 package com.taintech.common.actor
 
 import akka.actor.{Actor, ActorLogging, Props}
-import FileReader.{EOF, Next}
+import FileReader.{EOF, IgnoreHeader, Next, Line}
 
 import scala.io.Source
 
@@ -16,7 +16,8 @@ class FileReader(filePath: String) extends Actor with ActorLogging {
   override def preStart(): Unit = iterator = Source.fromFile(filePath).getLines
 
   def receive = {
-    case Next if iterator.nonEmpty => sender() ! iterator.next()
+    case IgnoreHeader if iterator.nonEmpty => iterator.next()
+    case Next if iterator.nonEmpty => sender() ! Line(iterator.next())
     case Next if iterator.isEmpty => sender() ! EOF
   }
 
@@ -24,7 +25,11 @@ class FileReader(filePath: String) extends Actor with ActorLogging {
 
 object FileReader {
 
+  case object IgnoreHeader
+
   case object Next
+
+  case class Line(s: String)
 
   case object EOF
 
