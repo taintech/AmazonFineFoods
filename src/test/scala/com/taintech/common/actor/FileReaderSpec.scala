@@ -2,7 +2,7 @@ package com.taintech.common.actor
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import FileReader.{EOF, Next}
+import FileReader.{EOF, IgnoreHeader, Line, Next}
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, MustMatchers}
 
 /**
@@ -24,13 +24,15 @@ class FileReaderSpec extends TestKit(ActorSystem("test-system"))
     val sender = TestProbe()
     val reader = system.actorOf(FileReader.props(testfile))
 
-    sender.send(reader, Next)
-    val line1 = sender.expectMsgType[String]
-    line1 must equal("test line 1")
+    sender.send(reader, IgnoreHeader)
 
     sender.send(reader, Next)
-    val line2 = sender.expectMsgType[String]
-    line2 must equal("test line 2")
+    val line1 = sender.expectMsgType[Line]
+    line1 must equal(Line("test line 1"))
+
+    sender.send(reader, Next)
+    val line2 = sender.expectMsgType[Line]
+    line2 must equal(Line("test line 2"))
 
     sender.send(reader, Next)
     sender.expectMsg(EOF)
