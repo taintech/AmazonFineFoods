@@ -1,5 +1,7 @@
 package com.taintech.common.actor
 
+import java.util.concurrent.ConcurrentHashMap
+import scala.collection.convert.decorateAsScala._
 import akka.actor.{Actor, ActorLogging}
 
 /**
@@ -10,7 +12,7 @@ class StringCounter extends Actor with ActorLogging {
 
   import StringCounter._
 
-  val map = scala.collection.mutable.HashMap.empty[String, Int]
+  val map: scala.collection.concurrent.Map[String, Int] = new ConcurrentHashMap[String, Int]().asScala
 
   def receive = {
     case s: String =>
