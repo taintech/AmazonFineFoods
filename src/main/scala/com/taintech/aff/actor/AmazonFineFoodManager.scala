@@ -6,6 +6,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import au.com.bytecode.opencsv.CSVParser
+import com.taintech.aff.actor.AmazonFineFoodManager.Review
 import com.taintech.common.actor.FileReader.{EOF, Line, Next}
 import com.taintech.common.actor.StringCounter.{GetTopStrings, StringCount}
 import com.taintech.common.actor.{FileReader, StringCounter}
@@ -16,7 +17,7 @@ import scala.concurrent.duration._
   * Author: Rinat Tainov
   * Date: 04/02/2017
   */
-class AmazonFineFoodManager extends Actor with ActorLogging {
+class AmazonFineFoodManager(filePath: String, parse: String => Review) extends Actor with ActorLogging {
 
   val uniques = scala.collection.mutable.HashSet.empty[Array[Byte]]
 
@@ -34,7 +35,7 @@ class AmazonFineFoodManager extends Actor with ActorLogging {
     productStats = context.actorOf(Props[StringCounter], "productStats")
     wordStats = context.actorOf(Props[StringCounter], "wordStats")
 
-    val reader = context.actorOf(FileReader.props(filePath))
+    val reader = context.actorOf(FileReader.props(filePath), "fileReader")
 
     reader ! FileReader.IgnoreHeader
     reader ! FileReader.Next
@@ -71,26 +72,28 @@ class AmazonFineFoodManager extends Actor with ActorLogging {
 
 object AmazonFineFoodManager {
 
-  //TODO as argument
-  val filePath = "/Users/taintech/Downloads/amazon-fine-foods/Reviews.csv"
+  def props(filePath: String) = Props(new AmazonFineFoodManager(filePath, new ReviewParser().parse))
 
   case class Review(userId: String, productId: String, text: String)
 
-  val csv = new CSVParser(',', '"', 0, false)
+  class ReviewParser {
 
-  def parse(line: String): Review = csv.parseLine(line) match {
-    case Array(
-    id: String,
-    productId: String,
-    userId: String,
-    profileName: String,
-    helpfulnessNumerator: String,
-    helpfulnessDenominator: String,
-    score: String,
-    time: String,
-    summary: String,
-    text: String
-    ) => Review(userId, productId, text)
+    val csv = new CSVParser(',', '"', 0, false)
+
+    def parse(line: String): Review = csv.parseLine(line) match {
+      case Array(
+      id: String,
+      productId: String,
+      userId: String,
+      profileName: String,
+      helpfulnessNumerator: String,
+      helpfulnessDenominator: String,
+      score: String,
+      time: String,
+      summary: String,
+      text: String
+      ) => Review(userId, productId, text)
+    }
   }
 
   def md5(s: String): Array[Byte] = {
