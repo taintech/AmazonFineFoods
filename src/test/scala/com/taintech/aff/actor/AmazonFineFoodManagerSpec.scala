@@ -1,4 +1,4 @@
-package com.taintech.common.actor
+package com.taintech.aff.actor
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
